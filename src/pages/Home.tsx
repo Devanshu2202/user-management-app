@@ -1,19 +1,21 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import UserCard from "../components/UserCard";
 import { getUsers } from "../services/userService";
 import type { User } from "../types/user";
 
 const Home = () => {
+
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
                 setLoading(true);
                 setError("");
-
                 const data = await getUsers();
 
                 setUsers(data);
@@ -31,14 +33,23 @@ const Home = () => {
     return (
         <main className="min-h-screen bg-gray-100 px-4 py-8">
             <div className="mx-auto max-w-7xl">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900">
-                        User Management
-                    </h1>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900">
+                            User Management
+                        </h1>
 
-                    <p className="mt-2 text-gray-600">
-                        Manage users with Create, Read, Update and Delete operations.
-                    </p>
+                        <p className="mt-2 text-gray-600">
+                            Manage users with Create, Read, Update and Delete operations.
+                        </p>
+                    </div>
+
+                    <Link
+                        to="/users/new"
+                        className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700"
+                    >
+                        + Add User
+                    </Link>
                 </div>
 
                 {loading && (
