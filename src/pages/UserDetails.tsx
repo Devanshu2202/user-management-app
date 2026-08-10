@@ -87,12 +87,21 @@ const UserDetails = () => {
     return (
         <main className="min-h-screen bg-gray-100 px-4 py-8">
             <div className="mx-auto max-w-4xl">
-                <Link
-                    to="/"
-                    className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700"
-                >
-                    ← Back to Users
-                </Link>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <Link
+                        to="/"
+                        className="text-sm font-medium text-blue-600 hover:text-blue-700"
+                    >
+                        ← Back to Users
+                    </Link>
+
+                    <Link
+                        to={`/users/${user.id}/edit`}
+                        className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                    >
+                        Edit User
+                    </Link>
+                </div>
 
                 <div className="mt-6 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-200">
                     <div className="border-b border-gray-200 p-6">
