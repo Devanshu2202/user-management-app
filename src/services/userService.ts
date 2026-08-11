@@ -3,6 +3,7 @@ import type { User } from "../types/user";
 
 const API_URL = "https://jsonplaceholder.typicode.com";
 const STORAGE_KEY = "user-management-users";
+const DELETED_USERS_KEY = "user-management-deleted-users";
 
 const getStoredUsers = (): User[] => {
     const storedUsers = localStorage.getItem(STORAGE_KEY);
@@ -14,23 +15,40 @@ const saveUsers = (users: User[]) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
 };
 
+const getDeletedUserIds = (): number[] => {
+    const storedDeletedIds = localStorage.getItem(DELETED_USERS_KEY);
+
+    return storedDeletedIds ? JSON.parse(storedDeletedIds) : [];
+};
+
+const saveDeletedUserIds = (ids: number[]) => {
+    localStorage.setItem(DELETED_USERS_KEY, JSON.stringify(ids));
+};
+
 export const getUsers = async (): Promise<User[]> => {
     const response = await axios.get<User[]>(`${API_URL}/users`);
 
     const apiUsers = response.data;
     const storedUsers = getStoredUsers();
+    const deletedUserIds = getDeletedUserIds();
+
+    const filteredApiUsers = apiUsers.filter(
+        (user) => !deletedUserIds.includes(user.id)
+    );
 
     const storedUserMap = new Map(
         storedUsers.map((user) => [user.id, user])
     );
 
-    const mergedApiUsers = apiUsers.map((apiUser) => {
+    const mergedApiUsers = filteredApiUsers.map((apiUser) => {
         const storedUser = storedUserMap.get(apiUser.id);
 
         return storedUser ?? apiUser;
     });
 
-    const apiUserIds = new Set(apiUsers.map((user) => user.id));
+    const apiUserIds = new Set(
+        filteredApiUsers.map((user) => user.id)
+    );
 
     const localOnlyUsers = storedUsers.filter(
         (user) => !apiUserIds.has(user.id)
@@ -97,7 +115,6 @@ export const updateUser = async (
 ): Promise<User> => {
     const storedUsers = getStoredUsers();
 
-    // Locally created users are updated in localStorage.
     if (id >= 1000) {
         const updatedUser: User = {
             ...userData,
@@ -113,7 +130,6 @@ export const updateUser = async (
         return updatedUser;
     }
 
-    // Original JSONPlaceholder users use PUT.
     const response = await axios.put<User>(
         `${API_URL}/users/${id}`,
         userData
@@ -128,4 +144,34 @@ export const updateUser = async (
     saveUsers(updatedUsers);
 
     return updatedUser;
-};  
+};
+
+export const deleteUser = async (id: number): Promise<void> => {
+    if (id >= 1000) {
+        const storedUsers = getStoredUsers();
+
+        const updatedUsers = storedUsers.filter(
+            (user) => user.id !== id
+        );
+
+        saveUsers(updatedUsers);
+
+        return;
+    }
+
+    await axios.delete(`${API_URL}/users/${id}`);
+
+    const deletedUserIds = getDeletedUserIds();
+
+    if (!deletedUserIds.includes(id)) {
+        saveDeletedUserIds([...deletedUserIds, id]);
+    }
+
+    const storedUsers = getStoredUsers();
+
+    const updatedUsers = storedUsers.filter(
+        (user) => user.id !== id
+    );
+
+    saveUsers(updatedUsers);
+};

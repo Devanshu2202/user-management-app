@@ -3,9 +3,10 @@ import type { User } from "../types/user";
 
 interface UserCardProps {
     user: User;
+    onDelete: (id: number) => void;
 }
 
-const UserCard = ({ user }: UserCardProps) => {
+const UserCard = ({ user, onDelete }: UserCardProps) => {
     return (
         <div className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-gray-200 transition hover:-translate-y-1 hover:shadow-md">
             <h2 className="text-lg font-semibold text-gray-900">
@@ -24,12 +25,29 @@ const UserCard = ({ user }: UserCardProps) => {
                 </p>
             </div>
 
-            <Link
-                to={`/users/${user.id}`}
-                className="mt-4 inline-block text-sm font-medium text-blue-600 hover:text-blue-700"
-            >
-                View Details →
-            </Link>
+            <div className="mt-4 flex flex-row justify-between gap-2">
+                <Link
+                    to={`/users/${user.id}`}
+                    className="rounded-lg bg-blue-600 px-4 py-2 text-center text-sm font-medium text-white transition hover:bg-blue-700"
+                >
+                    View Details
+                </Link>
+
+                <Link
+                    to={`/users/${user.id}/edit`}
+                    className="rounded-lg border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                >
+                    Edit
+                </Link>
+
+                <button
+                    type="button"
+                    onClick={() => onDelete(user.id)}
+                    className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
+                >
+                    Delete
+                </button>
+            </div>
         </div>
     );
 };

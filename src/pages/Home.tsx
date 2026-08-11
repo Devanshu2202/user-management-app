@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import UserCard from "../components/UserCard";
 import { getUsers } from "../services/userService";
 import type { User } from "../types/user";
+import { deleteUser } from "../services/userService";
 
 const Home = () => {
 
@@ -10,6 +11,28 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+
+    const handleDelete = async (id: number) => {
+        const confirmed = window.confirm(
+            "Are you sure you want to delete this user?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            await deleteUser(id);
+
+            setUsers((previousUsers) =>
+                previousUsers.filter((user) => user.id !== id)
+            );
+        } catch (error) {
+            console.error("Failed to delete user:", error);
+
+            setError("Unable to delete user. Please try again.");
+        }
+    };
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -67,7 +90,7 @@ const Home = () => {
                 {!loading && !error && (
                     <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                         {users.map((user) => (
-                            <UserCard key={user.id} user={user} />
+                            <UserCard key={user.id} user={user} onDelete={handleDelete} />
                         ))}
                     </div>
                 )}

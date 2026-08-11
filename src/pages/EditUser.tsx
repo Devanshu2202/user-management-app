@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getUserById, updateUser } from "../services/userService";
 import type { User } from "../types/user";
